@@ -1,0 +1,22 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/tesint
+    username: tesint_admin
+    password: tesint
+  application:
+    name: OLB
+  jpa:
+    hibernate:
+      ddl-auto: validate #update # validate - ????  Ensure schema matches JPA entities
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+    show-sql: true
+  sql:
+    init:
+      mode: never  # always
+jwt:
+#  secret:    R2xvYmFsIEF1dGhlbnRpY2F0aW9uTWFuYWdlciBjb25maWd1cmVk
+  secret:
+    access: qBTmv4oXFFR2GwjexDJ4t6fsIUIUhhXqlktXjXdkcyygs8nPVEwMfo29VDRRepYDVV5IkIxBMzr7OEHXEHd37w==
+    refresh: zL1HB3Pch05Avfynovxrf/kpF9O2m4NCWKJUjEp27s9J2jEG3ifiKCGylaZ8fDeoONSTJP/wAzKawB8F9rOMNg==
