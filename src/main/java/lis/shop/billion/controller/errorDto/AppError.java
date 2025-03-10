@@ -15,14 +15,9 @@ import lombok.NoArgsConstructor;
  *   {@code @NoArgsConstructor} — генерує конструктор без аргументів
  *   {@code @AllArgsConstructor} — генерує конструктор з усіма полями
  *
- * @field statusCode    HTTP статус-код, який описує тип помилки
- * @filed message       Повідомлення з описом помилки
+ * @param statusCode    HTTP статус-код, який описує тип помилки
+ * @param message       Повідомлення з описом помилки
  */
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class AppError {
-    private int statusCode;
-    private String message;
+public record AppError (int statusCode, String message){
 }

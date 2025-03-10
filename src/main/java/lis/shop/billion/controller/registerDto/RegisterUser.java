@@ -1,5 +1,9 @@
 package lis.shop.billion.controller.registerDto;
 
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+
 /**
  * Record-клас RegisterUser представляє DTO (Data Transfer Object) для реєстрації нового користувача.
  * Він містить поля username, email, password та confirmPassword.
@@ -13,7 +17,16 @@ package lis.shop.billion.controller.registerDto;
  * }
  */
 
-public record RegisterUser(String username,  String email, String password, String confirmPassword) {
+public record RegisterUser(
+        @NotBlank(message = "Ім'я користувача є обовязкове")
+        String username,
+        @NotBlank(message = "Електронна адреса є обовязкова")
+        @Email(message = "Електронна адреса повинна бути дійсною")
+        String email,
+        @Size(min = 6, message = "Пароль менше 6 символів")
+        String password,
+        @Size(min = 6, message = "Пароль менше 6 символів")
+        String confirmPassword) {
     /**
      * Перевіряє, чи співпадає пароль із підтвердженням пароля.
      *
