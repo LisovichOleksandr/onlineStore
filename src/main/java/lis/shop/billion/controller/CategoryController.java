@@ -6,6 +6,11 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.http.ResponseEntity;
 import java.util.List;
 
+/**
+ * Is empty
+ * TODO
+ */
+
 @RestController
 @RequestMapping("/api/categories")
 @RequiredArgsConstructor

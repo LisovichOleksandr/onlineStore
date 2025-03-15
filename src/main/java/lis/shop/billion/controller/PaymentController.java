@@ -6,6 +6,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.ResponseEntity;
 
+/**
+ * Is empty
+ * TODO
+ */
+
 @RestController
 @RequestMapping("/api/payments")
 @RequiredArgsConstructor
