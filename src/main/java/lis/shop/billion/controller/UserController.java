@@ -18,7 +18,7 @@ import org.springframework.http.ResponseEntity;
  */
 
 @RestController
-@RequestMapping("/api/users")
+@RequestMapping("/api/user")
 @RequiredArgsConstructor
 public class UserController {
     // Сервіс для логіки, пов’язаної з користувачами
@@ -31,7 +31,7 @@ public class UserController {
      * @return ResponseEntity з UserDto або статус UNAUTHORIZED, якщо користувач не автентифікований
      */
     @GetMapping
-    private ResponseEntity<UserDto> getUsers(){
+    private ResponseEntity<UserDto> getUser(){
         // Отримуємо JWT-аутентифікацію з контексту безпеки
         JwtAuthentication auth = (JwtAuthentication) SecurityContextHolder.getContext().getAuthentication();
         if (auth == null) {
@@ -43,28 +43,4 @@ public class UserController {
         UserDto userDto =  userService.getUserDtoByEmail(email);
         return ResponseEntity.ok().body(userDto);
     }
-
-    /**
-     * Повертає відповідь з інформацією про користувача за іменем користувача.
-     * (Поки що реалізація — заглушка, повертає "ok")
-     *
-     * @param username ім'я користувача
-     * @return ResponseEntity зі строкою "ok"
-     */
-    @GetMapping("/{username}")
-    public ResponseEntity<?> getUserByUsername(@PathVariable String username) {
-        return ResponseEntity.ok().body("ok");
-    }
-
-    /**
-     * Повертає об’єкт UserDetails поточного автентифікованого користувача.
-     *
-     * @param userDetails надається автоматично Spring Security
-     * @return ResponseEntity з UserDetails
-     */
-    @GetMapping("/ud")
-    public ResponseEntity<UserDetails> getUser(@AuthenticationPrincipal UserDetails userDetails) {
-        return ResponseEntity.ok(userDetails);
-    }
-
 }

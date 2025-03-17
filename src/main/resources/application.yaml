@@ -16,13 +16,11 @@ spring:
     init:
       mode: never  # always
 jwt:
-#  secret:    R2xvYmFsIEF1dGhlbnRpY2F0aW9uTWFuYWdlciBjb25maWd1cmVk
   secret:
     access: qBTmv4oXFFR2GwjexDJ4t6fsIUIUhhXqlktXjXdkcyygs8nPVEwMfo29VDRRepYDVV5IkIxBMzr7OEHXEHd37w==
     refresh: zL1HB3Pch05Avfynovxrf/kpF9O2m4NCWKJUjEp27s9J2jEG3ifiKCGylaZ8fDeoONSTJP/wAzKawB8F9rOMNg==
 springdoc:
   swagger-ui:
-#    path: /swagger-ui/index.html # Шлях до Swagger UI
     enabled: true # Увімкнути Swagger UI
   api-docs:
     path: /v3/api-docs # Шлях до JSON документації API
