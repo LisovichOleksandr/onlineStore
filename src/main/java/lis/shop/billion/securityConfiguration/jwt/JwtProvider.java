@@ -17,6 +17,34 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
 
+/**
+ * Сервіс для створення, валідації та розбору JWT-токенів (як Access, так і Refresh).
+ *
+ * Компонент відповідає за повний життєвий цикл JWT: від генерації до перевірки та
+ * вилучення claims (корисних даних з токена).
+ *
+ * Поля:
+ * - {@code jwtAccessSecret} — секретний ключ для підпису та перевірки Access токена.
+ * - {@code jwtRefreshSecret} — секретний ключ для Refresh токена.
+ *
+ * Ключі ініціалізуються в конструкторі на основі значень з application.properties
+ * (base64-encoded строки).
+ *
+ * Методи:
+ * Генерація токенів:
+ * Валідація токенів:
+ * Отримання claims (payload):
+ *
+ * Claims — це дані в тілі токена, які містять інформацію про користувача, наприклад:
+ * - roles — список ролей
+ * - userName — ім’я користувача
+ * - sub (subject) — email
+ * - exp — дата закінчення дії токена
+ *
+ * Цей клас є центральною точкою в логіці обробки JWT в додатку.
+ */
+
+
 @Slf4j
 @Component
 public class JwtProvider {
@@ -32,7 +60,11 @@ public class JwtProvider {
         this.jwtRefreshSecret = Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtRefreshSecret));
     }
 
-    // Генерація аксес токена
+    /**
+     * Генерація токенів:
+     * - {@link #generateAccessToken(User)} — створює короткоживучий Access токен (5 хвилин),
+     * додаючи в claims email (як subject), ролі та ім’я користувача.
+     * */
     public String generateAccessToken(@NonNull User user) {
         final LocalDateTime now = LocalDateTime.now();
         final Instant accessExpirationInstant = now.plusMinutes(5).atZone(ZoneId.systemDefault()).toInstant();
@@ -47,7 +79,9 @@ public class JwtProvider {
                 .compact();
     }
 
-    // Генерація рефреш токена
+    /**
+     * - {@link #generateRefreshToken(User)} — створює Refresh токен на 30 днів без додаткових claims.
+     * */
     public String generateRefreshToken(@NonNull User user) {
         final LocalDateTime now = LocalDateTime.now();
         final Instant refreshExpirationInstant = now.plusDays(30).atZone(ZoneId.systemDefault()).toInstant();
@@ -59,7 +93,10 @@ public class JwtProvider {
                 .compact();
     }
 
-
+    /** ✅ Валідація токенів:
+     * - {@link #validateAccessToken(String)} та {@link #validateRefreshToken(String)} —
+     *   перевіряють підпис, структуру та термін дії токенів.
+     * */
     public boolean validateAccessToken(@NonNull String accessToken) {
         return validateToken(accessToken, jwtAccessSecret);
     }
@@ -68,6 +105,9 @@ public class JwtProvider {
         return validateToken(refreshToken, jwtRefreshSecret);
     }
 
+    /**
+     * - {@link #validateToken(String, Key)} — спільний метод, що обробляє всі винятки та логування.
+     * */
     private boolean validateToken(@NonNull String token, @NonNull Key secret) {
         try {
             Jwts.parserBuilder()
@@ -89,7 +129,10 @@ public class JwtProvider {
         return false;
     }
 
-//    Claims - полезная нагрузка (payload) токена, содержащая информацию о пользователе и его правах
+    /** ✅ Отримання claims (payload):
+     * - {@link #getAccessClaims(String)} та {@link #getRefreshClaims(String)} —
+     *   дозволяють витягти claims з відповідного типу токена.
+     * */
     public Claims getAccessClaims(@NonNull String token) {
         return getClaims(token, jwtAccessSecret);
     }
@@ -98,6 +141,9 @@ public class JwtProvider {
         return getClaims(token, jwtRefreshSecret);
     }
 
+    /**
+     * - {@link #getClaims(String, Key)} — внутрішній метод для парсингу та повернення claims.
+     * */
     private Claims getClaims(@NonNull String token, @NonNull Key secret) {
         return Jwts.parserBuilder()
                 .setSigningKey(secret)

@@ -11,16 +11,46 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-//Клас призначенний для виклику в фільтрі доступу, створює класс інтерфейса Authentication
+/**
+ * Утилітний клас для створення об'єкта {@link JwtAuthentication} на основі JWT Claims.
+ *
+ * Призначення:
+ * - Використовується переважно в {@link JwtFilter}, коли зчитуються дані з токена й необхідно
+ *   створити екземпляр класу, що реалізує {@link org.springframework.security.core.Authentication}.
+ *
+ * Особливості:
+ * - Клас фінальний і має приватний конструктор (@NoArgsConstructor(access = PRIVATE)),
+ *   що забороняє створення екземплярів — він лише для статичних методів.
+ *
+ * Основна логіка:
+ * 1. {@link #generate(Claims)}
+ * 2. {@link #getRoles(Claims)}
+ *
+ * ROLE_IDS - Статична мапа
+ *
+ * Результат:
+ * Повертається об'єкт JwtAuthentication, який можна встановити в SecurityContextHolder
+ * для подальшої авторизації користувача.
+ */
+
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class JwtUtils {
 
-//    id для Role в системе чтоби не лезть  в БД
+    /** ROLE_IDS:
+     * - Статична мапа, яка жорстко задає відповідність між назвами ролей та їх ID.
+     * - Це дозволяє відновити повноцінний об'єкт Role без доступу до БД.
+     */
     private static final Map<String, Long> ROLE_IDS = Map.of(
             "ROLE_CUSTOMER", 1L,
             "ROLE_ADMIN", 2L
     );
 
+    /** 1. {@link #generate(Claims)}:
+     *    - Приймає claims із JWT.
+     *    - Створює та повертає {@link JwtAuthentication}, заповнюючи:
+     *      - username (з subject токена),
+     *      - roles (через окремий метод {@link #getRoles(Claims)}).
+     */
     public static JwtAuthentication generate(Claims claims) {
         final JwtAuthentication jwtInfoToken = new JwtAuthentication();
         jwtInfoToken.setRoles(getRoles(claims));
@@ -28,6 +58,12 @@ public final class JwtUtils {
         return jwtInfoToken;
     }
 
+    /** 2. {@link #getRoles(Claims)}:
+     *    - Витягує список назв ролей з claims.
+     *    - Створює об'єкти {@link Role}, заповнюючи:
+     *        - name — з claims,
+     *        - id — із статичної мапи {@code ROLE_IDS}, щоб уникнути запитів до бази даних.
+     */
     private static Set<Role> getRoles(Claims claims) {
         List<String> rolesRaw = claims.get("roles", List.class);
         return rolesRaw.stream()

@@ -16,6 +16,32 @@ import org.springframework.web.filter.GenericFilterBean;
 import java.io.IOException;
 import java.util.List;
 
+/**
+ * Фільтр JWT, який перехоплює всі HTTP-запити та виконує перевірку токена доступу.
+ * Наслідує {@link GenericFilterBean}, тому виконується один раз для кожного запиту.
+ *
+ * Основне призначення — вилучити JWT-токен з заголовка Authorization, перевірити його
+ * валідність і, якщо токен дійсний, створити об'єкт автентифікації
+ * {@link JwtAuthentication} та передати його в {@link SecurityContextHolder}.
+ *
+ * Поля:
+ * - {@code jwtProvider} — сервіс, який відповідає за перевірку токена та витяг claims з нього.
+ *
+ * Метод {@code doFilter()}:
+ * - Отримує токен з заголовка `Authorization`, якщо він є у форматі `Bearer ...`.
+ * - Перевіряє валідність токена через {@code jwtProvider.validateAccessToken()}.
+ * - Якщо токен валідний — витягує з нього claims, створює об'єкт автентифікації
+ *   через {@code JwtUtils.generate(claims)}, позначає його як автентифікованого
+ *   та зберігає в {@code SecurityContextHolder}.
+ *
+ * Метод {@code getTokenFromRequest()}:
+ * - Витягує JWT з заголовка `Authorization`, якщо він починається з `Bearer `.
+ *
+ * Завдяки цьому фільтру Spring Security зможе розпізнавати користувача на основі JWT,
+ * без необхідності використання сесій або стандартної форми логіну.
+ */
+
+
 @Slf4j
 @Component
 @RequiredArgsConstructor

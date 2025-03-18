@@ -15,9 +15,33 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.List;
+
 /**
- * закінчив на Swaager - не працює.
- * */
+ * Конфігураційний клас безпеки для Spring Security.
+ *
+ * Цей клас налаштовує фільтрацію запитів, автентифікацію, авторизацію,
+ * політику створення сесій, CORS та підключення JWT-фільтра.
+ *
+ * Основні компоненти:
+ * - {@link JwtFilter} — фільтр, який перевіряє JWT-токен у запитах.
+ * - {@code SecurityFilterChain} — ланцюжок фільтрів безпеки, де вказано, які запити дозволені, а які потребують авторизації.
+ * - {@code PasswordEncoder} — кодування паролів з використанням BCrypt.
+ * - {@code CorsConfigurationSource} — конфігурація CORS для дозволу запитів з фронтенду.
+ *
+ * Важливі правила авторизації:
+ * - `/api/auth/**`, `/swagger-ui/**` та `/v3/api-docs/**` — відкриті для всіх.
+ * - `/api/admin/**` — тільки для користувачів з роллю `ADMIN`.
+ * - `/api/users/**` — тільки для користувачів з роллю `CUSTOMER`.
+ * - `/api/products/**` — доступні для всіх.
+ * - Усі інші запити вимагають автентифікації.
+ *
+ * Використовується Stateless-політика сесій, тобто жодні сесії на сервері не зберігаються —
+ * автентифікація здійснюється виключно через JWT.
+ *
+ * Закоментовані методи `authenticationManager` і `authenticationProvider` можуть бути використані
+ * для явної конфігурації менеджера автентифікації, якщо потрібно.
+ */
+
 @Configuration
 @RequiredArgsConstructor
 public class SecurityConfig {
