@@ -17,19 +17,36 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
+/**
+ * Сервіс для управління користувачами (User).
+ * Відповідає за:
+ * - реєстрацію нових користувачів;
+ * - пошук за email або username;
+ * - перетворення користувача на DTO;
+ * - присвоєння ролі ROLE_CUSTOMER новим користувачам.
+ *
+ * Всі методи виконуються у межах транзакції (@Transactional).
+ */
+
+
 @Service
 @Transactional
 @RequiredArgsConstructor
 public class UserService {
+
+    // Репозиторії для доступу до користувачів, ролей і зв’язків між ними
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final UserRolesRepository userRolesRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public Optional<User> findByUsername(String username) {
-        return userRepository.findByUsername(username);
-    }
-
+    /**
+     * Знайти користувача за email.
+     * Якщо користувача не знайдено — кидає ResourceNotFoundException.
+     *
+     * @param email електронна адреса користувача
+     * @return знайдений об’єкт User
+     */
     public User findByEmail(String email) {
 
         Optional<User> byEmail = userRepository.findByEmail(email);
@@ -37,6 +54,14 @@ public class UserService {
         return user;
     }
 
+    /**
+     * Зареєструвати нового користувача.
+     * Перевіряє, чи email вже зайнятий, зберігає користувача,
+     * і призначає йому роль ROLE_CUSTOMER.
+     *
+     * @param registerUser DTO з даними для реєстрації
+     * @return збережений об’єкт User
+     */
     @Transactional
     public User saveUser(RegisterUser registerUser) {
         Optional<User> byEmail = userRepository.findByEmail(registerUser.email());
@@ -44,14 +69,14 @@ public class UserService {
             throw new ResourceNotFoundException("User has already been created with email: %s".formatted(registerUser.email()));
         }
 
-        // Создаем нового пользователя
+        // Створюємо нового користувача
         User user = new User();
         user.setUsername(registerUser.username());
         user.setEmail(registerUser.email());
         user.setPassword(passwordEncoder.encode(registerUser.password()));
         User save = userRepository.save(user);
 
-        // Проверяем, существует ли уже роль ROLE_CUSTOMER
+        // Отримуємо або створюємо роль ROLE_CUSTOMER
         Role roleCustomer = roleRepository.findByName("ROLE_CUSTOMER")
                 .orElseGet(() -> {
                     Role newRole = new Role();
@@ -59,9 +84,9 @@ public class UserService {
                     return roleRepository.save(newRole); // Сохраняем роль
                 });
 
-        // Создаем UserRoles
+        // Створюємо запис зв'язку користувача з роллю
         UserRoles userRoles = new UserRoles();
-        userRoles.setId(new UserRoleId(save.getId(), roleCustomer.getId())); // Используем ID существующей роли
+        userRoles.setId(new UserRoleId(save.getId(), roleCustomer.getId()));
         userRoles.setUser(user);
         userRoles.setRole(roleCustomer);
         userRolesRepository.save(userRoles);
@@ -69,12 +94,19 @@ public class UserService {
         return save;
     }
 
+    /**
+     * Отримати DTO користувача за email.
+     * DTO не містить пароля та чутливих даних.
+     *
+     * @param email email користувача
+     * @return об’єкт UserDto
+     */
     public UserDto getUserDtoByEmail(String email) {
         User userByEmail = findByEmail(email);
 
         UserDto userDto = new UserDto(
                 userByEmail.getId(),
-                null,
+                userByEmail.getUsername(),
                 null,
                 null,
                 email,
