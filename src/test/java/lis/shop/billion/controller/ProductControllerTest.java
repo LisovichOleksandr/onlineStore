@@ -1,24 +1,30 @@
 package lis.shop.billion.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lis.shop.billion.entity.Category;
 import lis.shop.billion.entity.Product;
 import lis.shop.billion.service.ProductService;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.web.servlet.MockMvc;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.*;
+
+@ExtendWith(MockitoExtension.class)
 class ProductControllerTest {
+
+    @Mock
+    private ProductService productService;
+
+    @InjectMocks
+    private ProductController productController;
 
     /**
      * Назва метода складається з трьох частин: назва метода + Test _ умова _ очікувана поведінка
@@ -32,10 +38,11 @@ class ProductControllerTest {
                 new Product(2L, "Computer", "He is bad worker", new BigDecimal(1100),
                         20, new Category(3L, "GI"), LocalDateTime.now()));
 
-
         // when
+        Mockito.when(productService.getAllProducts()).thenReturn(products);
 
         // then
+        Assertions.assertEquals(productController.getAllProducts(), products);
     }
 
     @Test
