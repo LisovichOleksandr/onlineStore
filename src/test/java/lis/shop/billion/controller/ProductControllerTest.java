@@ -47,9 +47,31 @@ class ProductControllerTest {
 
     @Test
     void getProductById() {
+        // given
+        Long id = 1L;
+        var products = List.of(
+                new Product(1L, "Telephone", "He is hard worker", new BigDecimal(200000),
+                        200, new Category(2L, "PI"), LocalDateTime.now()),
+                new Product(2L, "Computer", "He is bad worker", new BigDecimal(1100),
+                        20, new Category(3L, "GI"), LocalDateTime.now()));
+
+        // when
+        Mockito.when(productService.getProductById(id)).thenReturn(products.get(1));
+
+        // then
+        Assertions.assertEquals(productController.getProductById(id), products.get(1));
     }
 
     @Test
     void createProduct() {
+        // given
+        Product product = new Product(1L, "Telephone", "He is hard worker", new BigDecimal(200000),
+                200, new Category(2L, "PI"), LocalDateTime.now());
+
+        // when
+        Mockito.when(productService.saveProduct(product)).thenReturn(product);
+
+        // then
+        Assertions.assertEquals(productController.createProduct(product), product);
     }
 }
