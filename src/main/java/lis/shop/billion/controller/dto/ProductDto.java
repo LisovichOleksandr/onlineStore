@@ -1,5 +1,7 @@
 package lis.shop.billion.controller.dto;
 
+import lis.shop.billion.entity.Product;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
@@ -15,7 +17,19 @@ public record ProductDto(
         String description,
         BigDecimal price,
         Integer stockQuantity,
-        String Category,
+        String category,
         LocalDateTime createdAt
 ) {
+    // Статичний фабричний метод для створення ProductDto з Product
+    public static ProductDto fromProduct(Product product) {
+        return new ProductDto(
+                product.getId(),
+                product.getName(),
+                product.getDescription(),
+                product.getPrice(),
+                product.getStockQuantity(),
+                product.getCategory().getName(),
+                product.getCreatedAt()
+        );
+    }
 }

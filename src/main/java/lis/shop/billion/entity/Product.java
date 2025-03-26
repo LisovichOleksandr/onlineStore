@@ -1,6 +1,7 @@
 package lis.shop.billion.entity;
 
 import jakarta.persistence.*;
+import lis.shop.billion.controller.dto.ProductDto;
 import lombok.*;
 
 import java.math.BigDecimal;
@@ -72,5 +73,11 @@ public class Product {
      */
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
+
+    public static Product fromProductDto(ProductDto productDto){
+
+        return new Product(null, productDto.name(), productDto.description(), productDto.price(),
+                productDto.stockQuantity(), new Category(null, productDto.category()), LocalDateTime.now());
+    }
 }
 

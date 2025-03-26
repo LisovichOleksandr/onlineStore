@@ -1,5 +1,6 @@
 package lis.shop.billion.controller;
 
+import lis.shop.billion.controller.dto.ProductDto;
 import lis.shop.billion.entity.Category;
 import lis.shop.billion.entity.Product;
 import lis.shop.billion.service.ProductService;
@@ -16,6 +17,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 
 @ExtendWith(MockitoExtension.class)
 class ProductControllerTest {
@@ -65,13 +67,22 @@ class ProductControllerTest {
     @Test
     void createProduct() {
         // given
-        Product product = new Product(1L, "Telephone", "He is hard worker", new BigDecimal(200000),
-                200, new Category(2L, "PI"), LocalDateTime.now());
+        LocalDateTime date = LocalDateTime.parse("2025-03-26T06:22:59.241945340");
+        Product product = new Product(null, "Telephone", "He is hard worker", new BigDecimal(200000),
+                200, new Category(null, "PI"), null);
+        Product productReturn = new Product(1L, "Telephone", "He is hard worker", new BigDecimal(200000),
+                200, new Category(2L, "PI"), date);
+        // null поля для id та createdAt тому-що id встановлюється в БД, а createdAt в service
+        ProductDto productDtoRequest = new ProductDto(
+                null, "Telephone", "He is hard worker", new BigDecimal(200000), 200, "PI", null
+        );
+        ProductDto productDtoResponse = new ProductDto(
+                1L, "Telephone", "He is hard worker", new BigDecimal(200000), 200, "PI", date);
 
         // when
-        Mockito.when(productService.saveProduct(product)).thenReturn(product);
+        Mockito.when(productService.saveProduct(any(Product.class))).thenReturn(productReturn);
 
         // then
-        Assertions.assertEquals(productController.createProduct(product), product);
+        Assertions.assertEquals(productController.createProduct(productDtoRequest), productDtoResponse);
     }
 }
