@@ -15,6 +15,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -44,24 +45,24 @@ class ProductControllerTest {
         Mockito.when(productService.getAllProducts()).thenReturn(products);
 
         // then
-        Assertions.assertEquals(productController.getAllProducts(), products);
+        List<ProductDto> listProductDto = products.stream().
+                map(product -> ProductDto.fromProduct(product))
+                .collect(Collectors.toList());
+        Assertions.assertEquals(productController.getAllProducts(), listProductDto);
     }
 
     @Test
     void getProductById() {
         // given
         Long id = 1L;
-        var products = List.of(
-                new Product(1L, "Telephone", "He is hard worker", new BigDecimal(200000),
-                        200, new Category(2L, "PI"), LocalDateTime.now()),
-                new Product(2L, "Computer", "He is bad worker", new BigDecimal(1100),
-                        20, new Category(3L, "GI"), LocalDateTime.now()));
+        Product product = new Product(id, "Telephone", "He is hard worker", new BigDecimal(200000),
+                200, new Category(2L, "PI"), LocalDateTime.now());
 
         // when
-        Mockito.when(productService.getProductById(id)).thenReturn(products.get(1));
+        Mockito.when(productService.getProductById(id)).thenReturn(product);
 
         // then
-        Assertions.assertEquals(productController.getProductById(id), products.get(1));
+        Assertions.assertEquals(productController.getProductById(id), ProductDto.fromProduct(product));
     }
 
     @Test
