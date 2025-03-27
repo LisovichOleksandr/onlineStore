@@ -31,7 +31,7 @@ public class UserController {
      * @return ResponseEntity з UserDto або статус UNAUTHORIZED, якщо користувач не автентифікований
      */
     @GetMapping
-    private ResponseEntity<UserDto> getUser(){
+    public ResponseEntity<UserDto> getUser(){
         // Отримуємо JWT-аутентифікацію з контексту безпеки
         JwtAuthentication auth = (JwtAuthentication) SecurityContextHolder.getContext().getAuthentication();
         if (auth == null) {

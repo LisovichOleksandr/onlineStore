@@ -48,7 +48,7 @@ class ProductControllerTest {
         List<ProductDto> listProductDto = products.stream().
                 map(product -> ProductDto.fromProduct(product))
                 .collect(Collectors.toList());
-        Assertions.assertEquals(productController.getAllProducts(), listProductDto);
+        assertEquals(productController.getAllProducts(), listProductDto);
     }
 
     @Test
@@ -62,7 +62,7 @@ class ProductControllerTest {
         Mockito.when(productService.getProductById(id)).thenReturn(product);
 
         // then
-        Assertions.assertEquals(productController.getProductById(id), ProductDto.fromProduct(product));
+        assertEquals(productController.getProductById(id), ProductDto.fromProduct(product));
     }
 
     @Test
@@ -84,6 +84,6 @@ class ProductControllerTest {
         Mockito.when(productService.saveProduct(any(Product.class))).thenReturn(productReturn);
 
         // then
-        Assertions.assertEquals(productController.createProduct(productDtoRequest), productDtoResponse);
+        assertEquals(productController.createProduct(productDtoRequest), productDtoResponse);
     }
 }
