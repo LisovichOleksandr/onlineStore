@@ -1,12 +1,15 @@
 package lis.shop.billion.service;
 
+import lis.shop.billion.entity.Category;
 import lis.shop.billion.entity.Product;
 import lis.shop.billion.exception.ResourceNotFoundException;
+import lis.shop.billion.repository.CategoryRepository;
 import lis.shop.billion.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import java.util.List;
+
+import java.util.*;
 
 /**
  * Сервіс для управління товарами (Product).
@@ -27,6 +30,10 @@ public class ProductService implements IProductService {
     // Репозиторій для взаємодії з базою даних
     private final ProductRepository productRepository;
 
+    private final CategoryRepository categoryRepository;
+
+    // TODo перекласти на Укр., І доробити метод saveProduct
+    private Map<Long, String> categoriesName = Map.of(1L, "Электроника", 2L, "Одежда", 3L, "Книги", 4L, "Игрушки", 5L, "загальна");
     /**
      * Отримати всі товари з бази даних.
      *
@@ -70,6 +77,13 @@ public class ProductService implements IProductService {
      */
     @Override
     public Product saveProduct(Product product) {
+        // шукаєм категорію в БД
+        if (product.getCategory() == null){
+            product.setCategory(new Category());
+        }
+
+        Optional<Category> byName = categoryRepository.findByName(product.getCategory().getName());
+
         return productRepository.save(product);
     }
 }
