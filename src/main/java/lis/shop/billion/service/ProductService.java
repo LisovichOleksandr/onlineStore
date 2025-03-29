@@ -32,8 +32,9 @@ public class ProductService implements IProductService {
 
     private final CategoryRepository categoryRepository;
 
-    // TODo перекласти на Укр., І доробити метод saveProduct
-    private Map<Long, String> categoriesName = Map.of(1L, "Электроника", 2L, "Одежда", 3L, "Книги", 4L, "Игрушки", 5L, "загальна");
+    // Map для відображення категорій в БД
+    private Map<String, Long> categoriesName = Map.of("електротовари", 1L,
+            "одяг", 2L, "книги", 3L, "іграшки", 4L, "загальна", 5L);
     /**
      * Отримати всі товари з бази даних.
      *
@@ -78,12 +79,17 @@ public class ProductService implements IProductService {
     @Override
     public Product saveProduct(Product product) {
         // шукаєм категорію в БД
-        if (product.getCategory() == null){
-            product.setCategory(new Category());
+        Long ID = 5L;
+        String defaultCategory = "загальна";
+        // Призначаєм ID для category
+        if (product.getCategory() != null && categoriesName.containsKey(product.getCategory().getName())){
+            Long categoryId = categoriesName.get(product.getCategory().getName());
+            product.getCategory().setId(categoryId);
+            return productRepository.save(product);
+        } else {
+        // Призначаєм категорію "загальна" в випадку відсутності такої категорії у продукту, або відсутності такої в БД.
+            product.setCategory(new Category(ID, defaultCategory));
+            return productRepository.save(product);
         }
-
-        Optional<Category> byName = categoryRepository.findByName(product.getCategory().getName());
-
-        return productRepository.save(product);
     }
 }
