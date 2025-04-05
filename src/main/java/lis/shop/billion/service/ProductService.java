@@ -30,9 +30,7 @@ public class ProductService implements IProductService {
     // Репозиторій для взаємодії з базою даних
     private final ProductRepository productRepository;
 
-    private final CategoryRepository categoryRepository;
-
-    // Map для відображення категорій в БД
+    // Map для відображення категорій в БД, опісля появи нової категорії в БД, потрібно добавити її і сюда тоже.
     private Map<String, Long> categoriesName = Map.of("електротовари", 1L,
             "одяг", 2L, "книги", 3L, "іграшки", 4L, "загальна", 5L);
     /**
