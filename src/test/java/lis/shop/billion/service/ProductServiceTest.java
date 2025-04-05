@@ -30,6 +30,7 @@ class ProductServiceTest {
     @Mock
     private ProductRepository productRepository;
 
+    // Map для отображения категорий в БД.
     private Map<String, Long> categoriesName;
 
     @BeforeEach
