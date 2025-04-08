@@ -2,12 +2,10 @@ package lis.shop.billion.service;
 
 import lis.shop.billion.controller.dto.UserDto;
 import lis.shop.billion.controller.registerDto.RegisterUser;
-import lis.shop.billion.entity.Role;
-import lis.shop.billion.entity.User;
-import lis.shop.billion.entity.UserRoleId;
-import lis.shop.billion.entity.UserRoles;
+import lis.shop.billion.entity.*;
 import lis.shop.billion.exception.ResourceNotFoundException;
 import lis.shop.billion.repository.RoleRepository;
+import lis.shop.billion.repository.UserDetailsRepository;
 import lis.shop.billion.repository.UserRepository;
 import lis.shop.billion.repository.UserRolesRepository;
 import lombok.RequiredArgsConstructor;
@@ -36,6 +34,7 @@ public class UserService {
 
     // Репозиторії для доступу до користувачів, ролей і зв’язків між ними
     private final UserRepository userRepository;
+    private final UserDetailsRepository userDetailsRepository;
     private final RoleRepository roleRepository;
     private final UserRolesRepository userRolesRepository;
     private final PasswordEncoder passwordEncoder;
@@ -103,15 +102,18 @@ public class UserService {
      */
     public UserDto getUserDtoByEmail(String email) {
         User userByEmail = findByEmail(email);
-
+        UserDetails byUserId = this.userDetailsRepository
+                .findByUserId(userByEmail.getId()).orElseThrow(() -> new RuntimeException("Заповніть ваші данні"));
+        // TODO Доробити, протестувати,
+        // TODO Провірити foreign key в таблиці users
         UserDto userDto = new UserDto(
                 userByEmail.getId(),
                 userByEmail.getUsername(),
-                null,
-                null,
+                byUserId.getLastName(),
+                byUserId.getAge(),
                 email,
                 userByEmail.getCreatedAt(),
-                null);
+                byUserId.getPhotoUrl());
         return userDto;
     }
 }
