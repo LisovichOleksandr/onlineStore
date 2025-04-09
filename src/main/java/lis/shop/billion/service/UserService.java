@@ -109,6 +109,7 @@ public class UserService {
         UserDto userDto = new UserDto(
                 userByEmail.getId(),
                 userByEmail.getUsername(),
+                byUserId.getFirstName(),
                 byUserId.getLastName(),
                 byUserId.getAge(),
                 email,

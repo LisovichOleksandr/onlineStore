@@ -25,3 +25,7 @@ springdoc:
   api-docs:
     path: /v3/api-docs # Шлях до JSON документації API
     enabled: true # Увімкнути JSON документацію
+
+app:   # Шлях для збереження аватарок
+  upload:
+    dir: ./uploads/avatars

@@ -23,6 +23,7 @@ import java.time.LocalDateTime;
 
 public record UserDto (
         Long id,
+        String nickname,
         String firstName,
         String lastName,
         Integer age,
