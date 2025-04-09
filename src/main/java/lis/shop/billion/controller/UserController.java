@@ -43,4 +43,18 @@ public class UserController {
         UserDto userDto =  userService.getUserDtoByEmail(email);
         return ResponseEntity.ok().body(userDto);
     }
+
+    @PostMapping()
+    public ResponseEntity<?> saveUserInfo(@RequestBody UserDto userDto){
+        // Отримуємо JWT-аутентифікацію з контексту безпеки
+        JwtAuthentication auth = (JwtAuthentication) SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null) {
+            // Якщо користувач не автентифікований — повертаємо статус 401
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        // Отримуємо email з JWT і шукаємо користувача в базі
+        String email = (String) auth.getPrincipal();
+        userService.saveUserDetails(email, userDto);
+        return ResponseEntity.ok().body("Інформацію збережено");
+    }
 }

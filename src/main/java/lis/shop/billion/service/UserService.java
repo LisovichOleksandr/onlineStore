@@ -102,20 +102,38 @@ public class UserService {
      */
     public UserDto getUserDtoByEmail(String email) {
         User userByEmail = findByEmail(email);
-        UserDetails byUserId = this.userDetailsRepository
-                .findByUserId(userByEmail.getId()).orElseThrow(() -> new RuntimeException("Заповніть ваші данні"));
+        UserDto defaultData = new UserDto(userByEmail.getId(), userByEmail.getUsername(), null, null,
+                null, userByEmail.getEmail(), userByEmail.getCreatedAt(), null);
+        Optional<UserDetails> byUserId = this.userDetailsRepository
+                .findByUserId(userByEmail.getId());
+        if (byUserId.isEmpty()) {
+            return defaultData;
+        }
+        UserDetails userDetails = byUserId.get();
         // TODO Доробити, протестувати,
         // TODO Провірити foreign key в таблиці users
         UserDto userDto = new UserDto(
                 userByEmail.getId(),
                 userByEmail.getUsername(),
-                byUserId.getFirstName(),
-                byUserId.getLastName(),
-                byUserId.getAge(),
+                userDetails.getFirstName(),
+                userDetails.getLastName(),
+                userDetails.getAge(),
                 email,
                 userByEmail.getCreatedAt(),
-                byUserId.getPhotoUrl());
+                userDetails.getPhotoUrl());
         return userDto;
+    }
+
+    @Transactional
+    public void saveUserDetails(String email, UserDto userDto) {
+        User byEmail = userRepository.findByEmail(email).orElseThrow( () ->
+                new RuntimeException("Користувач з таким емайлом відсутній"));
+        Optional<UserDetails> detailsByUserId = userDetailsRepository.findByUserId(byEmail.getId());
+
+        UserDetails userDetails = detailsByUserId.get();
+        userDetails.setFirstName(userDto.firstName());
+        userDetails.setLastName(userDto.lastName());
+        userDetails.setAge(userDto.age());
     }
 }
 
