@@ -1,21 +1,26 @@
 package lis.shop.billion.controller;
 
 import lis.shop.billion.securityConfiguration.jwt.JwtAuthentication;
+import lis.shop.billion.service.ImageService;
+import lis.shop.billion.service.SecurityService;
 import lis.shop.billion.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.server.reactive.HttpHandler;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Map;
 import java.util.UUID;
 
@@ -35,6 +40,47 @@ public class AvatarController {
     private String uploadDir;
 
     private final UserService userService;
+
+    // кастомний SecurityService
+    private final SecurityService securityService;
+
+    private final ImageService imageService;
+
+    /**
+     * Завантажує аватар користувача на сервер.
+     *
+     * @return ResponseEntity зі статусом OK і назвою збереженого файлу, або помилкою
+     */
+    @GetMapping("/avatar")
+    public ResponseEntity<Resource> getAvatar() {
+        try {
+//        Отримуємо email з JWT-аутентифікації з контексту безпеки
+        String email = this.securityService.getAuthenticatedUserEmail();
+
+        // Получимо назву фото з БД по email
+        String photoName = userService.findPhotoNameByEmail(email);
+
+        if (photoName == null || photoName.isBlank()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        Resource file = this.imageService.loadImage(photoName);
+
+        // Определяем Content-Type динамически
+        String contentType = Files.probeContentType(Paths.get(file.getURI()));
+        if (contentType == null) {
+            contentType = "application/octet-stream";
+        }
+
+        return ResponseEntity.ok()
+            .contentType(MediaType.parseMediaType(contentType))
+            .header(HttpHeaders.CONTENT_DISPOSITION,
+                "inline; filename=\"" + file.getFilename() + "\"")
+            .body(file);
+        } catch (Exception e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
 
     /**
      * Завантажує аватар користувача на сервер.

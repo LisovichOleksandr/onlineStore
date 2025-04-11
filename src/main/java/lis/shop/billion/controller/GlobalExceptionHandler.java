@@ -2,6 +2,7 @@ package lis.shop.billion.controller;
 
 import lis.shop.billion.controller.errorDto.AppError;
 import lis.shop.billion.exception.ResourceNotFoundException;
+import lis.shop.billion.exception.UnauthorizedException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -47,5 +48,16 @@ public class GlobalExceptionHandler {
         log.error(exception.getMessage(), exception);
         return new ResponseEntity<>(
                 new AppError(HttpStatus.NOT_FOUND.value(), exception.getMessage()), HttpStatus.NOT_FOUND);
+    }
+
+    /**
+     * Обробляє винятки, коли користувач не авторизований.
+     *
+     * @param exception кастомний виняток
+     * @return повідомленням "User is not authenticated" з кодом 401
+     */
+    @ExceptionHandler(UnauthorizedException.class)
+    public ResponseEntity<String> handleUnauthorized(UnauthorizedException exception){
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(exception.getMessage());
     }
 }

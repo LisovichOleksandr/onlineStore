@@ -16,4 +16,7 @@ public interface UserDetailsCustomRepository extends JpaRepository<UserDetails, 
     @Modifying
     @Query(value = "UPDATE UserDetails u SET u.photoUrl = :namePhoto WHERE u.user.email = :email")
     void savePhotoNameByEmail(@Param("email") String email, @Param("namePhoto")String namePhoto);
+
+    @Query(value = "SELECT ud.photoUrl FROM UserDetails ud WHERE ud.user.email= :email")
+    String findPhotoNameByEmail(@Param("email") String email);
 }

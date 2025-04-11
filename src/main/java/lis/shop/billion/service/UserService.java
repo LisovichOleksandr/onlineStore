@@ -145,5 +145,13 @@ public class UserService {
     public void savePhoto(String email, String fileName) {
         this.userDetailsCustomRepository.savePhotoNameByEmail(email, fileName);
     }
+
+    public String findPhotoNameByEmail(String email) {
+        String photoNameByEmail = this.userDetailsCustomRepository.findPhotoNameByEmail(email);
+        if (photoNameByEmail == null) {
+            throw new RuntimeException("Фото відсутнє");
+        }
+        return photoNameByEmail;
+    }
 }
 
