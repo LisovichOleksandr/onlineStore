@@ -15,6 +15,10 @@ spring:
   sql:
     init:
       mode: never  # always
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 5MB
 jwt:
   secret:
     access: qBTmv4oXFFR2GwjexDJ4t6fsIUIUhhXqlktXjXdkcyygs8nPVEwMfo29VDRRepYDVV5IkIxBMzr7OEHXEHd37w==
@@ -28,4 +32,4 @@ springdoc:
 
 app:   # Шлях для збереження аватарок
   upload:
-    dir: ./uploads/avatars
+    dir: /home/clarity/Desktop/billion(copy)/src/main/java/lis/shop/billion/uploads/avatars

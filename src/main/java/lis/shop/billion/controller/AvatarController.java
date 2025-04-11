@@ -10,7 +10,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Map;
 import java.util.UUID;
+
 
 /**
  * Контролер для завантаження аватарів користувачів.
@@ -32,7 +34,7 @@ public class AvatarController {
      * @return ResponseEntity зі статусом OK і назвою збереженого файлу, або помилкою
      */
     @PostMapping("/avatar")
-    public ResponseEntity<String> uploadAvatar(@RequestParam("file")MultipartFile file) throws IOException {
+    public ResponseEntity<String> uploadAvatar(@RequestParam("photo")MultipartFile file) throws IOException {
 
         if (file.isEmpty()){
             return ResponseEntity.badRequest().body("Файл пустий");
@@ -44,11 +46,24 @@ public class AvatarController {
             uploadPath.mkdirs();
         }
 
-        // Генеруєм унікальне ім'я для файла
-        String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
-        File destination = new File(uploadDir + fileName);
-        file.transferTo(destination);
+        // Генеруєм унікальне ім'я для файла]
+        String originalFilename = file.getOriginalFilename();
 
-        return ResponseEntity.ok("Файл збережено" + fileName);
+        String cleanFilename = originalFilename != null ?
+                originalFilename.replaceAll("[^a-zA-Z0-9.-]", "_") :
+                "avatar";
+        String fileName = UUID.randomUUID() + "_" + cleanFilename;
+        // створюємо повний шлях до файлу
+        File destination = new File(uploadDir + File.separator + fileName);
+        try {
+            file.transferTo(destination.toPath());
+        } catch (IOException e) {
+            return ResponseEntity.internalServerError().body("Не вдалося зберегти файл");
+        }
+
+        return ResponseEntity.ok(Map.of(
+                "message", "Файл збережено",
+                "fileName", fileName
+        ).toString());
     }
 }

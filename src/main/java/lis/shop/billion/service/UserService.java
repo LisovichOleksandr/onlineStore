@@ -9,6 +9,7 @@ import lis.shop.billion.repository.UserDetailsRepository;
 import lis.shop.billion.repository.UserRepository;
 import lis.shop.billion.repository.UserRolesRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -127,13 +128,17 @@ public class UserService {
     @Transactional
     public void saveUserDetails(String email, UserDto userDto) {
         User byEmail = userRepository.findByEmail(email).orElseThrow( () ->
-                new RuntimeException("Користувач з таким емайлом відсутній"));
-        Optional<UserDetails> detailsByUserId = userDetailsRepository.findByUserId(byEmail.getId());
+                new UsernameNotFoundException("Користувач з таким емайлом відсутній"));
+        UserDetails userDetails = userDetailsRepository.findByUserId(byEmail.getId())
+                .orElseGet(() -> UserDetails.builder()
+                        .user(byEmail)
+                        .build());
 
-        UserDetails userDetails = detailsByUserId.get();
         userDetails.setFirstName(userDto.firstName());
         userDetails.setLastName(userDto.lastName());
         userDetails.setAge(userDto.age());
+
+        userDetailsRepository.save(userDetails);
     }
 }
 
