@@ -1,7 +1,13 @@
 package lis.shop.billion.controller;
 
+import lis.shop.billion.securityConfiguration.jwt.JwtAuthentication;
+import lis.shop.billion.service.UserService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -21,11 +27,14 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/user")
+@RequiredArgsConstructor
 public class AvatarController {
 
     // Шлях до директорії, в яку зберігатимуться аватари (налаштовується в application.yaml)
     @Value("${app.upload.dir}")
     private String uploadDir;
+
+    private final UserService userService;
 
     /**
      * Завантажує аватар користувача на сервер.
@@ -56,7 +65,18 @@ public class AvatarController {
         // створюємо повний шлях до файлу
         File destination = new File(uploadDir + File.separator + fileName);
         try {
+            // положили файл в директорію
             file.transferTo(destination.toPath());
+
+            // Отримуємо JWT-аутентифікацію з контексту безпеки
+            JwtAuthentication auth = (JwtAuthentication) SecurityContextHolder.getContext().getAuthentication();
+            if (auth == null) {
+                // Якщо користувач не автентифікований — повертаємо статус 401
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            }
+            // Отримуємо email з JWT і прив'язуем фотографію до користувача по емайлу
+            String email = (String) auth.getPrincipal();
+            userService.savePhoto(email, fileName);
         } catch (IOException e) {
             return ResponseEntity.internalServerError().body("Не вдалося зберегти файл");
         }

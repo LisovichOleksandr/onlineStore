@@ -5,7 +5,7 @@ import lis.shop.billion.controller.registerDto.RegisterUser;
 import lis.shop.billion.entity.*;
 import lis.shop.billion.exception.ResourceNotFoundException;
 import lis.shop.billion.repository.RoleRepository;
-import lis.shop.billion.repository.UserDetailsRepository;
+import lis.shop.billion.repository.UserDetailsCustomRepository;
 import lis.shop.billion.repository.UserRepository;
 import lis.shop.billion.repository.UserRolesRepository;
 import lombok.RequiredArgsConstructor;
@@ -35,7 +35,7 @@ public class UserService {
 
     // Репозиторії для доступу до користувачів, ролей і зв’язків між ними
     private final UserRepository userRepository;
-    private final UserDetailsRepository userDetailsRepository;
+    private final UserDetailsCustomRepository userDetailsCustomRepository;
     private final RoleRepository roleRepository;
     private final UserRolesRepository userRolesRepository;
     private final PasswordEncoder passwordEncoder;
@@ -105,7 +105,7 @@ public class UserService {
         User userByEmail = findByEmail(email);
         UserDto defaultData = new UserDto(userByEmail.getId(), userByEmail.getUsername(), null, null,
                 null, userByEmail.getEmail(), userByEmail.getCreatedAt(), null);
-        Optional<UserDetails> byUserId = this.userDetailsRepository
+        Optional<UserDetails> byUserId = this.userDetailsCustomRepository
                 .findByUserId(userByEmail.getId());
         if (byUserId.isEmpty()) {
             return defaultData;
@@ -129,7 +129,7 @@ public class UserService {
     public void saveUserDetails(String email, UserDto userDto) {
         User byEmail = userRepository.findByEmail(email).orElseThrow( () ->
                 new UsernameNotFoundException("Користувач з таким емайлом відсутній"));
-        UserDetails userDetails = userDetailsRepository.findByUserId(byEmail.getId())
+        UserDetails userDetails = userDetailsCustomRepository.findByUserId(byEmail.getId())
                 .orElseGet(() -> UserDetails.builder()
                         .user(byEmail)
                         .build());
@@ -138,7 +138,12 @@ public class UserService {
         userDetails.setLastName(userDto.lastName());
         userDetails.setAge(userDto.age());
 
-        userDetailsRepository.save(userDetails);
+        userDetailsCustomRepository.save(userDetails);
+    }
+
+    @Transactional
+    public void savePhoto(String email, String fileName) {
+        this.userDetailsCustomRepository.savePhotoNameByEmail(email, fileName);
     }
 }
 
