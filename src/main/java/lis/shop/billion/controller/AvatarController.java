@@ -1,8 +1,11 @@
 package lis.shop.billion.controller;
 
+import lis.shop.billion.entity.User;
+import lis.shop.billion.entity.UserDetails;
 import lis.shop.billion.securityConfiguration.jwt.JwtAuthentication;
 import lis.shop.billion.service.ImageService;
 import lis.shop.billion.service.SecurityService;
+import lis.shop.billion.service.UserDetailsCustomService;
 import lis.shop.billion.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -45,6 +48,8 @@ public class AvatarController {
     private final SecurityService securityService;
 
     private final ImageService imageService;
+
+    private final UserDetailsCustomService userDetailsService;
 
     /**
      * Завантажує аватар користувача на сервер.
@@ -94,7 +99,7 @@ public class AvatarController {
         if (file.isEmpty()){
             return ResponseEntity.badRequest().body("Файл пустий");
         }
-
+/**
         // Створюєм папку якщо її немає
         File uploadPath = new File(uploadDir);
         if(!uploadPath.exists()){
@@ -122,14 +127,22 @@ public class AvatarController {
             }
             // Отримуємо email з JWT і прив'язуем фотографію до користувача по емайлу
             String email = (String) auth.getPrincipal();
-            userService.savePhoto(email, fileName);
+ */
+        String email = securityService.getAuthenticatedUserEmail();
+        try {
+        String fileName = imageService.saveImage(file);
+        UserDetails userDetails = userDetailsService.findDetailsByEmail(email);
+        if (!userDetails.getPhotoUrl().isEmpty()){
+            String photoUrlName = userDetails.getPhotoUrl();
+            imageService.deleteImage(photoUrlName);
+        }
+        userService.savePhoto(email, fileName);
         } catch (IOException e) {
             return ResponseEntity.internalServerError().body("Не вдалося зберегти файл");
         }
 
         return ResponseEntity.ok(Map.of(
-                "message", "Файл збережено",
-                "fileName", fileName
+                "message", "Файл збережено"
         ).toString());
     }
 }

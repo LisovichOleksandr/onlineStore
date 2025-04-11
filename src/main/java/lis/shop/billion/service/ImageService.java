@@ -33,19 +33,26 @@ public class ImageService {
         }
     }
 
-//    public String saveImage(MultipartFile file) throws IOException {
-//        Path rootLocation = Paths.get(loadDir);
-//        if (!Files.exists(rootLocation)) {
-//            Files.createDirectories(rootLocation);
-//        }
-//
-//        String originalFilename = file.getOriginalFilename();
-//        String extension = originalFilename.substring(originalFilename.lastIndexOf("."));
-//        String newFilename = UUID.randomUUID() + extension;
-//
-//        Files.copy(file.getInputStream(), rootLocation.resolve(newFilename));
-//        return newFilename;
-//    }
+    public String saveImage(MultipartFile file) throws IOException {
+
+        Path rootLocation = Paths.get(loadDir);
+
+        // Створюєм папку якщо її немає
+        if (!Files.exists(rootLocation)) {
+            Files.createDirectories(rootLocation);
+        }
+
+        // Генеруєм унікальне ім'я для файла]
+        String originalFilename = file.getOriginalFilename();
+        String cleanFilename = originalFilename != null ?
+                originalFilename.replaceAll("[^a-zA-Z0-9.-]", "_") :
+                "avatar";
+        String newFilename = UUID.randomUUID() + "_" + cleanFilename;
+
+
+        Files.copy(file.getInputStream(), rootLocation.resolve(newFilename));
+        return newFilename;
+    }
 
     public void deleteImage(String filename) throws IOException {
         Path rootLocation = Paths.get(loadDir);

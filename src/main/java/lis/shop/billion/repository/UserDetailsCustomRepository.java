@@ -13,6 +13,9 @@ public interface UserDetailsCustomRepository extends JpaRepository<UserDetails, 
     @Query(value = "SELECT ud FROM UserDetails ud WHERE ud.user.id = :userId")
     Optional<UserDetails> findByUserId(@Param("userId") Long userId);
 
+    @Query(value = "SELECT ud FROM UserDetails ud WHERE ud.user.email = :email")
+    Optional<UserDetails> findByEmail(@Param("email") String email);
+
     @Modifying
     @Query(value = "UPDATE UserDetails u SET u.photoUrl = :namePhoto WHERE u.user.email = :email")
     void savePhotoNameByEmail(@Param("email") String email, @Param("namePhoto")String namePhoto);
