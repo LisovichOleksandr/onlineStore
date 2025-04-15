@@ -1,8 +1,6 @@
 package lis.shop.billion.controller;
 
-import lis.shop.billion.entity.User;
 import lis.shop.billion.entity.UserDetails;
-import lis.shop.billion.securityConfiguration.jwt.JwtAuthentication;
 import lis.shop.billion.service.ImageService;
 import lis.shop.billion.service.SecurityService;
 import lis.shop.billion.service.UserDetailsCustomService;
@@ -11,21 +9,15 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.server.reactive.HttpHandler;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Map;
-import java.util.UUID;
 
 
 /**

@@ -36,7 +36,7 @@ class UserControllerTest {
     void getUser_ShouldReturnUserDto_WhenAuthentication() {
         // Підготовка даних
         String email = "test@example.com";
-        UserDto userDto = new UserDto(1L, null,null,null, email, null, null);
+        UserDto userDto = new UserDto(1L, null,null,null,33, email, null, null);
 
         // Мокаєм контекст безпеки
         when(securityContext.getAuthentication()).thenReturn(authentication);
